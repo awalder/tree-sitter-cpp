@@ -65,6 +65,7 @@ module.exports = grammar(C, {
     [$._declaration_specifiers, $._constructor_specifiers],
     [$._binary_fold_operator, $._fold_operator],
     [$._function_declarator_seq],
+    [$.macro_attribute, $._class_name],
   ],
 
   inline: ($, original) => original.concat([
@@ -128,6 +129,10 @@ module.exports = grammar(C, {
       ')',
     ),
 
+    macro_attribute: $ => seq(
+      $.identifier,
+    ),
+
     _type_specifier: $ => choice(
       $.struct_specifier,
       $.union_specifier,
@@ -167,7 +172,8 @@ module.exports = grammar(C, {
       choice(
         field('name', $._class_name),
         seq(
-          optional(field('name', $._class_name)),
+          seq(optional($.macro_attribute),
+          optional(field('name', $._class_name))),
           optional($.virtual_specifier),
           optional($.base_class_clause),
           field('body', $.field_declaration_list),
